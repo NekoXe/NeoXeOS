@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>NeoXe OS — 新一代内存操作系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        button:focus, button:focus-visible, .nav-btn:focus, .theme-switch:focus, 
+        .version-summary:focus, .qa-question:focus, .download-link:focus,
+        .friend-link:focus, .star-item:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 背景动画 */
+        @keyframes floatSoft1 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(6%, 8%) scale(1.2); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        @keyframes floatSoft2 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-5%, 6%) scale(1.25); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        @keyframes floatSoft3 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(7%, -5%) scale(1.15); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        .bg-blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .blob {
+            position: a bsolute;
+            filter: blur(70px);
+            border-radius: 50%;
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+        .blob1 {
+            width: 60vw;
+            height: 60vw;
+            top: -15vh;
+            left: -10vw;
+            background: radial-gradient(circle, #0078d4, #2a6eb0);
+            opacity: 0.35;
+            animation: floatSoft1 24s infinite alternate ease-in-out;
+        }
+        .blob2 {
+            width: 45vw;
+            height: 45vw;
+            bottom: -10vh;
+            right: -8vw;
+            background: radial-gradient(circle, #2b6fbd, #5082c2);
+            opacity: 0.25;
+            animation: floatSoft2 28s infinite alternate ease-in-out;
+        }
+        .blob3 {
+            width: 40vw;
+            height: 40vw;
+            top: 45%;
+            left: 35%;
+            background: radial-gradient(circle, #3c7bcb, #6b9eff);
+            opacity: 0.18;
+            animation: floatSoft3 22s infinite alternate ease-in-out;
+        }
+
+        :root {
+            --bg-body: #F3F5F9;
+            --card-bg: rgba(255, 255, 255, 0.78);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --text-primary: #1E1F2C;
+            --text-secondary: #5A5E7A;
+            --accent: #0078D4;
+            --accent-hover: #106EBE;
+            --setting-hover: rgba(0, 0, 0, 0.03);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.08);
+            --expand-bg: rgba(0, 0, 0, 0.02);
+            --backdrop-blur: blur(16px);
+            --card-inset: inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+        body.dark {
+            --bg-body: #12131C;
+            --card-bg: rgba(29, 31, 42, 0.82);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #F0F3FF;
+            --text-secondary: #ADB3CC;
+            --accent: #4C9AFF;
+            --setting-hover: rgba(255, 255, 255, 0.04);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.3);
+            --expand-bg: rgba(255, 255, 255, 0.02);
+            --card-inset: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            transition: background 0.3s ease;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.45;
+            min-height: 100vh;
+            position: relative;
+        }
+        .win11-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border-radius: 32px;
+            box-shadow: var(--shadow-md), 0 0 0 1px var(--card-border);
+            overflow: hidden;
+            transition: background 0.2s, backdrop-filter 0.2s;
+        }.app-header {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .logo-area { display: flex; align-items: center; gap: 8px; }
+        .logo-img { height: 28px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .logo-text { font-size: 1.2rem; font-weight: 600; background: linear-gradient(135deg, var(--text-primary), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .theme-switch {
+            background: rgba(128,128,128,0.08);
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            padding: 4px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            height: 32px;
+            box-shadow: var(--card-inset), 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .theme-switch:hover {
+            background: var(--setting-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08), var(--card-inset);
+        }
+        .nav-bar {
+            padding: 8px 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            border-bottom: 1px solid var(--card-border);
+            background: transparent;
+        }
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 40px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.2s, color 0.2s, box-shadow 0.1s;
+            line-height: 1.4;
+        }
+        .nav-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,120,212,0.3);
+        }
+        .nav-btn:not(.active):hover {
+            background: var(--setting-hover);
+            color: var(--text-primary);
+        }
+        .page-content {
+            display: none;
+            padding: 20px;
+            animation: fade 0.2s ease;
+        }
+        .page-content.active-page { display: block; }
+        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+        .setting-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 18px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm), var(--card-inset), 0 0 0 1px rgba(0,0,0,0.02);
+        }
+        .setting-section:hover {
+            box-shadow: var(--shadow-md), var(--card-inset);
+            transform: translateY(-2px);
+        }
+        .section-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.01);
+        }
+        .section-header i { color: var(--accent); }
+        .version-item {
+            border-bottom: 1px solid var(--card-border);
+        }
+        .version-summary {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .version-summary:hover {
+            background: var(--setting-hover);
+        }
+        .version-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .version-title { font-weight: 600; font-size: 1rem; }
+        .version-position {
+            background: var(--accent);
+            color: white;
+            border-radius: 40px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .version-status {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }.expand-icon { transition: transform 0.12s; margin-left: 6px; }
+        .version-detail-wrapper {
+            display: block;
+            overflow: hidden;
+            transition: max-height 0.12s cubic-bezier(0.2, 0.9, 0.4, 1), opacity 0.1s ease;
+            max-height: 0;
+            opacity: 0;
+            background: transparent;
+        }
+        .version-detail-wrapper.show {
+            max-height: 600px;
+            opacity: 1;
+        }
+        .version-detail { padding: 0 16px; }
+        .version-detail-inner {
+            padding: 12px 0 16px;
+            background: rgba(128,128,128,0.04);
+            backdrop-filter: blur(2px);
+            border-radius: 20px;
+        }
+        .detail-row { margin-bottom: 14px; }
+        .detail-row h4 { font-size: 0.85rem; margin-bottom: 6px; }
+        .img-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+        .img-group img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: transparent;
+            object-fit: cover;
+        }
+        .download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2);
+            transition: transform 0.05s ease;
+        }
+        .download-link:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .qa-item {
+            border-bottom: 1px solid var(--card-border);
+        }
+        .qa-question {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .qa-question:hover {
+            background: var(--setting-hover);
+        }
+        .qa-answer-wrapper {
+            display: block;
+            overflow: hidden;
+            transition: max-height 0.12s cubic-bezier(0.2, 0.9, 0.4, 1), opacity 0.1s ease;
+            max-height: 0;
+            opacity: 0;
+            background: transparent;
+        }
+        .qa-answer-wrapper.show {
+            max-height: 300px;
+            opacity: 1;
+        }
+        .qa-answer { padding: 0 16px; }
+        .qa-answer-inner {
+            padding: 8px 0 16px 24px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            background: rgba(128,128,128,0.05);
+            backdrop-filter: blur(4px);
+            border-radius: 20px;
+            margin: 4px 0 8px 0;
+        }
+        /* 声明列表样式 - 序号与正文无间距（gap:0），序号向右移动 */
+        .declaration-list {
+            padding: 4px 0;
+        }
+        .declaration-item {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            gap: 0;              /* 完全消除序号与文字之间的空白 */
+            align-items: flex-start;
+        }
+        .decl-num {
+            font-weight: 600;
+            color: var(--accent);
+            min-width: 30px;
+            flex-shrink: 0;
+            margin-left: 16px;   /* 向右移动，但不增加与文字间距 */
+        }
+        .decl-text {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            flex: 1;
+        }/* 授权表格样式 */
+        .auth-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .auth-table th, .auth-table td {
+            text-align: left;
+            padding: 12px 8px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .auth-table th {
+            font-weight: 600;
+            color: var(--accent);
+            padding-left: 16px;   /* 表头蓝色文字向右移 */
+        }
+        .auth-table td {
+            color: var(--text-secondary);
+            padding-left: 16px;
+        }
+        .auth-note {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            padding: 8px 16px;
+            border-top: 1px solid var(--card-border);
+            background: rgba(0,0,0,0.02);
+        }
+        .friend-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .friend-link {
+            background: rgba(128,128,128,0.06);
+            border-radius: 40px;
+            padding: 6px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            box-shadow: var(--card-inset), 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        .friend-link:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .star-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        .star-name { font-weight: 600; }
+        .star-badge {
+            background: var(--accent);
+            color: white;
+            border-radius: 40px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 16px;
+            border-top: 1px solid var(--card-border);
+        }
+        @media (max-width: 640px) {
+            body { padding: 8px; }
+            .page-content { padding: 14px; }
+            .version-summary { flex-direction: column; align-items: flex-start; }
+            .version-left { width: 100%; justify-content: space-between; }
+            .img-group { flex-direction: column; }
+            .img-group img { max-width: 100%; }
+            .nav-bar { gap: 6px; }
+            .nav-btn { padding: 6px 14px; font-size: 0.85rem; }
+            .declaration-item { padding: 8px 4px; }
+            .decl-num { margin-left: 12px; min-width: 26px; }
+            .auth-table th, .auth-table td { padding-left: 12px; }
+        }</style>
+</head>
+<body>
+<div class="bg-blobs">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+</div>
+<div class="win11-container">
+    <div class="app-header">
+        <div class="logo-area"><img src="/img/logo.ico" alt="logo" class="logo-img" onerror="this.src='';"> <span class="logo-text">NeoXe OS</span></div>
+        <div class="theme-switch" id="themeToggleBtn">
+            <i id="themeIcon" class="fas fa-sun"></i>
+            <span id="themeLabel">浅色</span>
+        </div>
+    </div>
+    <div class="nav-bar">
+        <button class="nav-btn active" data-page="home"><i class="fas fa-home"></i> 主页</button>
+        <button class="nav-btn" data-page="series"><i class="fas fa-layer-group"></i> 系列</button>
+        <button class="nav-btn" data-page="thanks"><i class="fas fa-heart"></i> 感谢</button>
+        <button class="nav-btn" data-page="about"><i class="fas fa-info-circle"></i> 关于</button>
+        <button class="nav-btn" data-page="faq"><i class="fas fa-question-circle"></i> 问答</button>
+        <button class="nav-btn" data-page="legal"><i class="fas fa-file-contract"></i> 声明</button>
+    </div>
+
+    <!-- 主页 -->
+    <div id="home" class="page-content active-page">
+        <div class="setting-section">
+            <div class="section-header"><i class="fas fa-rocket"></i> 欢迎使用 NeoXe OS</div>
+            <div class="version-summary" style="cursor:default;"><div><span class="version-title">新一代内存操作系统</span><div class="item-desc" style="margin-top:4px;">原生UWP · 纯净美观 · 多场景覆盖</div></div><div class="version-status"><i class="fas fa-microchip"></i> 2023.9 首次 UWPPE</div></div>
+            <div class="version-summary" style="cursor:default;"><div><span class="version-title">开发状态</span><div class="item-desc">假期维护，6月下旬活跃</div></div><div class="version-status"><span class="version-position" style="background:#5A5E7A;">假期维护</span></div></div>
+        </div>
+        <div class="setting-section">
+            <div class="section-header"><i class="fas fa-star"></i> 明星系列</div>
+            <div class="version-summary" style="cursor:default;"><div class="star-item"><span class="star-name">Ultra</span><span class="star-badge">24H2</span></div><div class="version-status">旗舰全能 · 全功能体验</div></div>
+            <div class="version-summary" style="cursor:default;"><div class="star-item"><span class="star-name">Elite</span><span class="star-badge">23H2</span></div><div class="version-status">高级增强 · .NET/蓝牙/媒体</div></div>
+            <div class="version-summary" style="cursor:default;"><div class="star-item"><span class="star-name">Max</span><span class="star-badge">稳定版</span></div><div class="version-status">主流性能 · 4GB RAM</div></div>
+            <div class="version-summary" style="cursor:default;"><div class="star-item"><span class="star-name">Slim</span><span class="star-badge">~700MB</span></div><div class="version-status">轻量均衡 · 2GB RAM适配</div></div>
+            <div class="version-summary" style="cursor:default;"><div class="star-item"><span class="star-name">SuperLite</span><span class="star-badge">379MB</span></div><div class="version-status">1GB内存运行UWP | 实验品·日用性不大</div></div>
+        </div>
+        <div class="setting-section">
+            <div class="section-header"><i class="fas fa-chart-line"></i> 社区数据</div>
+            <div class="version-summary" style="cursor:default;"><div>累计下载</div><div class="version-status">100+ (2026.6)</div></div>
+            <div class="version-summary" style="cursor:default;"><div>核心交流群</div><div class="version-status">70+ 极客</div></div>
+            <div class="version-summary" style="cursor:default;"><div>首个 UWPPE</div><div class="version-status">2023年9月</div></div>
+        </div>
+        <div class="setting-section">
+            <div class="section-header"><i class="fas fa-link"></i> 友情链接</div>
+            <div style="padding: 12px 16px;"><div class="friend-links"><a href="https://space.bilibili.com/3493129957149016" target="_blank" class="friend-link"><i class="fab fa-bilibili"></i> XeRiver的B站</a><a href="#" class="friend-link" onclick="return false;"><i class="fab fa-github"></i> GitHub Pages</a><a href="https://qm.qq.com/q/1075906894" target="_blank" class="friend-link"><i class="fab fa-qq"></i> QQ群:1075906894</a></div></div>
+        </div>
+    </div>
+
+    <!-- 系列页 --><!-- 感谢页 -->
+    <div id="thanks" class="page-content">
+        <div class="setting-section"><div class="section-header"><i class="fas fa-heart"></i> 致谢贡献者</div>
+            <div class="version-summary" style="cursor:default;"><i class="fas fa-user-astronaut"></i> <strong>XeRiver</strong> — 主导规划者</div>
+            <div class="version-summary" style="cursor:default;"><i class="fas fa-laptop-code"></i> <strong>Infinity</strong> — 技术支持顾问 <span class="version-status"><a href="#" class="friend-link" style="margin-left: 12px;" onclick="return false;">🔗 链接待补充</a></span></div>
+            <div class="version-summary" style="cursor:default;"><i class="fas fa-bullhorn"></i> <strong>MS-CHS</strong> — 早期宣传与社区推广 <span class="version-status"><a href="https://space.bilibili.com/YOUR_MSCHS_UID" target="_blank" class="friend-link" style="margin-left: 12px;"><i class="fab fa-bilibili"></i> B站主页</a></span></div>
+            <div class="version-summary" style="cursor:default;"><i class="fas fa-palette"></i> <strong>时光浅巷</strong> — Logo设计</div>
+        </div>
+        <div class="setting-section"><div class="section-header"><i class="fas fa-users"></i> 社区致意</div><div class="version-summary" style="cursor:default;"><div>无忧启动论坛 · 内测群70+ · 累计下载100+</div></div></div>
+    </div>
+
+    <!-- 关于页 -->
+    <div id="about" class="page-content">
+        <div class="setting-section"><div class="section-header"><i class="fas fa-dragon"></i> 关于 NeoXe OS</div>
+            <div class="version-summary" style="cursor:default;"><div><strong>项目起源</strong><div class="item-desc">2023.9 首个UWPPE → 2025末规划品牌 → 2026正式推出</div></div></div>
+            <div class="version-summary" style="cursor:default;"><div><strong>技术哲学</strong><div class="item-desc">原生组件 · 高度集成 · 现代化</div></div></div>
+        </div>
+        <div class="setting-section"><div class="section-header"><i class="fas fa-user-astronaut"></i> 关于作者</div>
+            <div class="version-summary" style="cursor:default;"><div><strong>XeRiver</strong><div class="item-desc">湖南永州 · 开发者，学业繁忙，假期在线</div></div><div class="version-status"><a href="https://space.bilibili.com/3493129957149016" target="_blank" style="color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;"><i class="fab fa-bilibili"></i> B站: XeRiver</a></div></div>
+        </div>
+        <div class="setting-section"><div class="section-header"><i class="fas fa-history"></i> 重要沿革</div>
+            <div class="version-summary" style="cursor:default;"><div>2023.9</div><div class="version-status">首个UWPPE</div></div>
+            <div class="version-summary" style="cursor:default;"><div>2025末</div><div class="version-status">规划NeoXe品牌</div></div>
+            <div class="version-summary" style="cursor:default;"><div>2026</div><div class="version-status">发布SuperLite 379MB</div></div>
+        </div>
+    </div>
+
+    <!-- 问答页 --><div id="about" class="page-content">
+        <div class="setting-section"><div class="section-header"><i class="fas fa-dragon"></i> 关于 NeoXe OS</div>
+            <div class="version-summary" style="cursor:default;"><div><strong>项目起源</strong><div class="item-desc">2023.9 首个UWPPE → 2025末规划品牌 → 2026正式推出</div></div></div>
+            <div class="version-summary" style="cursor:default;"><div><strong>技术哲学</strong><div class="item-desc">原生组件 · 高度集成 · 现代化</div></div></div>
+        </div>
+        <div class="setting-section"><div class="section-header"><i class="fas fa-user-astronaut"></i> 关于作者</div>
+            <div class="version-summary" style="cursor:default;"><div><strong>XeRiver</strong><div class="item-desc">湖南永州 · 开发者，学业繁忙，假期在线</div></div><div class="version-status"><a href="https://space.bilibili.com/3493129957149016" target="_blank" style="color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;"><i class="fab fa-bilibili"></i> B站: XeRiver</a></div></div>
+        </div>
+        <div class="setting-section"><div class="section-header"><i class="fas fa-history"></i> 重要沿革</div>
+            <div class="version-summary" style="cursor:default;"><div>2023.9</div><div class="version-status">首个UWPPE</div></div>
+            <div class="version-summary" style="cursor:default;"><div>2025末</div><div class="version-status">规划NeoXe品牌</div></div>
+            <div class="version-summary" style="cursor:default;"><div>2026</div><div class="version-status">发布SuperLite 379MB</div></div>
+        </div>
+    </div>
+
+    <!-- 问答页 -->
+    <div id="faq" class="page-content">
+        <div class="setting-section"><div class="section-header"><i class="fas fa-question-circle"></i> 常见问题</div>
+            <div class="qa-item"><div class="qa-question">❓ 如何使用NeoXe OS？<i class="fas fa-chevron-down expand-icon"></i></div><div class="qa-answer-wrapper"><div class="qa-answer"><div class="qa-answer-inner"><strong>方法1（U盘启动）：</strong> 使用 Ventoy 或 Rufus 将 ISO 写入 U盘，从 U盘启动即可。<br><strong>方法2（本地硬盘引导）：</strong> 使用 EasyBCD（Windows）或 BOOTICE 添加 NeoXe OS 的 WIM 启动项。步骤：① 将 ISO 中的 boot.wim / 系统文件解压到本地分区（如 D:\NeoXe）；② 打开 EasyBCD → 添加新条目 → WinPE → 路径选择 D:\NeoXe\boot.wim → 添加；③ 重启选择 NeoXe OS 进入。<br><strong>注意：</strong> 系统运行于内存，重启后更改丢失，适合维护/体验。</div></div></div></div>
+            <div class="qa-item"><div class="qa-question">❓ 硬件要求？<i class="fas fa-chevron-down expand-icon"></i></div><div class="qa-answer-wrapper"><div class="qa-answer"><div class="qa-answer-inner"><strong>CPU：</strong> 建议 Intel Nehalem 架构或更高 (64位)，AMD 推土机架构或更高。24H2版本需要 SSE4.2。<br><strong>内存：</strong> SuperLite 最低 1GB，Slim 推荐 2GB，Max 推荐 4GB，Elite 推荐 6GB+，Ultra 推荐 8GB+。<br><strong>SuperLite</strong> 可在单核 CPU + 1GB 内存下运行。支持 BIOS / UEFI。</div></div></div></div>
+            <div class="qa-item"><div class="qa-question">❓ 如何联网/装驱动？<i class="fas fa-chevron-down expand-icon"></i></div><div class="qa-answer-wrapper"><div class="qa-answer"><div class="qa-answer-inner">Elite/Ultra内置完整网络驱动，WiFi可直接连接。特殊硬件需手动注入驱动。</div></div></div></div>
+            <div class="qa-item"><div class="qa-question">❓ 为什么软件无法运行？<i class="fas fa-chevron-down expand-icon"></i></div><div class="qa-answer-wrapper"><div class="qa-answer"><div class="qa-answer-inner">缺少VC++/.NET运行库。Elite/Ultra已集成.NET，其他系列请自行安装或使用便携版。</div></div></div></div>
+            <div class="qa-item"><div class="qa-question">❓ 能保存文件吗？<i class="fas fa-chevron-down expand-icon"></i></div><div class="qa-answer-wrapper"><div class="qa-answer"><div class="qa-answer-inner">重启后数据清零，重要文件请存至U盘/其他硬盘分区。持久化请使用RAMOS或WTG。</div></div></div></div>
+            <div class="qa-item"><div class="qa-question">❓ 最新版本去哪获取？<i class="fas fa-chevron-down expand-icon"></i></div><div class="qa-answer-wrapper"><div class="qa-answer"><div class="qa-answer-inner">关注B站 XeRiver 或 QQ群 1075906894，GitHub及国内网盘同步更新。</div></div></div></div>
+        </div>
+    </div>
+
+    <!-- 声明与授权页（序号与文字无间距，序号右移） --><div id="legal" class="page-content">
+        <div class="setting-section">
+            <div class="section-header"><i class="fas fa-scale-balanced"></i> 用户协议与声明</div>
+            <div class="declaration-list">
+                <div class="declaration-item"><span class="decl-num">1.</span><span class="decl-text">本项目为非商用项目，所有资源禁止商用。</span></div>
+                <div class="declaration-item"><span class="decl-num">2.</span><span class="decl-text">禁止在 NeoXe OS 及其衍生作品中添加任何广告或用于盈利的信息。</span></div>
+                <div class="declaration-item"><span class="decl-num">3.</span><span class="decl-text">NeoXe OS 尽力保证安全与稳定，但使用本项目造成的任何损失，我们一律不负责。</span></div>
+                <div class="declaration-item"><span class="decl-num">4.</span><span class="decl-text">若需对 NeoXe OS 进行修改后二次发布，请先加入 QQ 群（1075906894）向群主获取授权。</span></div>
+                <div class="declaration-item"><span class="decl-num">5.</span><span class="decl-text">使用 NeoXe OS 即代表您同意并接受以上全部条款。</span></div>
+            </div>
+        </div>
+        <div class="setting-section">
+            <div class="section-header"><i class="fas fa-user-check"></i> 已授权人员</div>
+            <table class="auth-table">
+                <thead>
+                    <tr><th>授权人员</th><th>授权版本</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="2" style="text-align:center; color:var(--text-secondary);">暂无授权记录</td></tr>
+                </tbody>
+            </table>
+            <div class="auth-note">
+                <i class="fas fa-info-circle"></i> 注：NeoXe OS 的授权仅限于被授权人本人及其对应的指定版本，<strong>不具有继承性</strong>。授权不可转让、不可用于其他版本或衍生作品。
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-note">© 2026 NeoXe OS — 云母质感 · 圆润流畅</div>
+</div>
+
+<script>
+    // 主题切换
+    const themeBtn = document.getElementById('themeToggleBtn');
+    const bodyEl = document.body;
+    const themeLabel = document.getElementById('themeLabel');
+    const themeIcon = document.getElementById('themeIcon');
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            bodyEl.classList.add('dark');
+            localStorage.setItem('neoxe_theme', 'dark');
+            themeLabel.innerText = '深色';
+            themeIcon.className = 'fas fa-moon';
+        } else {
+            bodyEl.classList.remove('dark');
+            localStorage.setItem('neoxe_theme', 'light');
+            themeLabel.innerText = '浅色';
+            themeIcon.className = 'fas fa-sun';
+        }
+    }
+    const saved = localStorage.getItem('neoxe_theme');
+    if (saved === 'dark') setTheme('dark');
+    else setTheme('light');
+    themeBtn.addEventListener('click', () => {
+        const isDark = bodyEl.classList.contains('dark');
+        setTheme(isDark ? 'light' : 'dark');
+    });
+
+    // 页面切换
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const pages = document.querySelectorAll('.page-content');
+    navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-page');
+            navBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            pages.forEach(p => p.classList.remove('active-page'));
+            document.getElementById(target).classList.add('active-page');
+        });
+    });
+
+    // 图片加载function loadImages(seriesName, container) {
+        if (!container) return;
+        container.innerHTML = '';
+        const base = `/img/${seriesName}/`;
+        const exts = ['1.webp', '2.webp', '1.png', '2.png', '1.jpg', '2.jpg'];
+        exts.forEach(file => {
+            const img = new Image();
+            img.style.maxWidth = '200px';
+            img.style.height = 'auto';
+            img.style.borderRadius = '12px';
+            img.alt = `${seriesName} preview`;
+            img.onload = () => { container.appendChild(img); if (container.style.display === 'none') container.style.display = ''; };
+            img.onerror = () => {};
+            img.src = base + file;
+        });
+        setTimeout(() => { if (container.children.length === 0) container.style.display = 'none'; else container.style.display = ''; }, 150);
+    }
+    const groups = { Ultra:'Ultra', Elite:'Elite', Max:'Max', Slim:'Slim', SuperLite:'SuperLite', Arm:'Arm', RE:'RE' };
+    for (const [id, name] of Object.entries(groups)) {
+        const el = document.getElementById(`imgGroup-${id}`);
+        if (el) loadImages(name, el);
+    }
+
+    // 展开折叠
+    document.querySelectorAll('.version-item').forEach(item => {
+        const sum = item.querySelector('.version-summary');
+        const wrap = item.querySelector('.version-detail-wrapper');
+        const icon = sum?.querySelector('.expand-icon');
+        if (sum && wrap) {
+            sum.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isShow = wrap.classList.contains('show');
+                if (isShow) {
+                    wrap.classList.remove('show');
+                    icon?.classList.remove('fa-chevron-up');
+                    icon?.classList.add('fa-chevron-down');
+                } else {
+                    wrap.classList.add('show');
+                    icon?.classList.remove('fa-chevron-down');
+                    icon?.classList.add('fa-chevron-up');
+                }
+            });
+        }
+    });
+    document.querySelectorAll('.qa-item').forEach(item => {
+        const q = item.querySelector('.qa-question');
+        const wrap = item.querySelector('.qa-answer-wrapper');
+        const icon = q?.querySelector('.expand-icon');
+        if (q && wrap) {
+            q.addEventListener('click', () => {
+                const isShow = wrap.classList.contains('show');
+                if (isShow) {
+                    wrap.classList.remove('show');
+                    icon?.classList.remove('fa-chevron-up');
+                    icon?.classList.add('fa-chevron-down');
+                } else {
+                    wrap.classList.add('show');
+                    icon?.classList.remove('fa-chevron-down');
+                    icon?.classList.add('fa-chevron-up');
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>
